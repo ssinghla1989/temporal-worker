@@ -1,10 +1,11 @@
 # temporal-worker
 
-A minimal Spring Boot application that runs a Temporal worker and exposes an HTTP endpoint to start a workflow. The workflow calls an external API via Retrofit and returns a processed string.
+A minimal Spring Boot application that runs a Temporal worker and exposes an HTTP endpoint to start a workflow. The workflow calls an external API via Retrofit.
 
 ## Features
 - Temporal Java SDK worker registered on a configurable task queue
-- REST endpoint to start a workflow synchronously
+- REST endpoint to start a workflow asynchronously (returns 202 with IDs)
+- Activity retries and timeouts with explicit non-retryable failure types
 - Retrofit client with OkHttp logging to call an external API
 - Simple, production-friendly structure (activities, workflows, worker registration, options factories)
 
@@ -27,17 +28,24 @@ Run tests:
 ```
 
 ## API
-Start the demo workflow and receive the result (plain text):
+Start the demo workflow asynchronously (returns 202 Accepted with workflow IDs):
 ```bash
 curl -s -X POST "http://localhost:8080/api/workflows/my" \
   -H "Content-Type: application/json" \
   -d '{"input":"world"}'
 ```
 
-Response is a string such as:
+Example response:
+```json
+{"workflowId":"my-<hash>","runId":"<uuid>"}
 ```
-Processed via API: { ...payload from external API... }
-```
+
+Notes:
+- You can optionally pass a custom `workflowId` to achieve idempotent starts and later query/signal by ID:
+  ```json
+  {"input":"world","workflowId":"order-123"}
+  ```
+  If omitted, the server derives a deterministic ID from `input`.
 
 ## Configuration
 Application properties (see `app/src/main/resources/application.properties`):
@@ -72,15 +80,25 @@ EXTERNALAPI_BASEURL=https://httpbin.org/ \
   - Builds `WorkflowClient` and `WorkerFactory`
   - Starts the factory on app startup (configurable via `temporal.worker.enabled`)
 - Worker registration: `com.example.temporalworker.worker.MyWorkerRegistration`
-  - Registers `MyWorkflowImpl` and `MyActivityImpl` on `temporal.taskQueue`
+  - Registers `MyWorkflowImpl` and `EchoActivityImpl` on `temporal.taskQueue`
 - Workflow: `com.example.temporalworker.workflows.MyWorkflow` and `MyWorkflowImpl`
-  - Calls activity stub with default `ActivityOptions` (10s timeout)
-- Activity: `com.example.temporalworker.activities.MyActivity` and `MyActivityImpl`
-  - Calls `ExternalApiService.echo(name)` using Retrofit
+  - Uses per-method activity stubs with tailored `ActivityOptions` and `RetryOptions`
+- Activity: `com.example.temporalworker.activities.EchoActivity` and `EchoActivityImpl`
+  - Calls `httpbin` via Retrofit
 - Retrofit config: `com.example.temporalworker.config.RetrofitConfig`
   - Configures base URL (`externalApi.baseUrl`) and OkHttp logging
 - HTTP controller: `com.example.temporalworker.controller.WorkflowController`
-  - `POST /api/workflows/my` starts the workflow synchronously using `MyWorkflowService`
+  - `POST /api/workflows/my` starts the workflow asynchronously and returns `workflowId`/`runId`
+
+### Timeouts and retries
+- Activity defaults: start-to-close timeout, schedule-to-close timeout, and exponential backoff retries.
+- Per-method options:
+  - `process` and `postProcess` have separate `ActivityOptions` with different retry timing.
+  - `doNotRetry("HttpClientError")` prevents retries on client-side errors (4xx).
+- Failure semantics:
+  - `EchoActivityImpl` throws `ApplicationFailure`:
+    - 5xx and network errors are retryable.
+    - 4xx errors use a non-retryable type (`HttpClientError`).
 
 ## Project layout
 Key directories:
