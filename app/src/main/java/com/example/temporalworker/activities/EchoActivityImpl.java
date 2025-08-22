@@ -1,6 +1,8 @@
 package com.example.temporalworker.activities;
 
 import com.example.temporalworker.clients.model.HttpBinAnythingResponse;
+import com.example.temporalworker.clients.model.HttpBinPostRequest;
+import com.example.temporalworker.clients.model.HttpBinPostResponse;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -10,6 +12,7 @@ import retrofit2.http.Path;
 
 @Component
 public class EchoActivityImpl implements EchoActivity {
+    private final Retrofit retrofit;
     private final EchoApi echoApi;
 
     interface EchoApi {
@@ -18,6 +21,7 @@ public class EchoActivityImpl implements EchoActivity {
     }
 
     public EchoActivityImpl(Retrofit retrofit) {
+        this.retrofit = retrofit;
         this.echoApi = retrofit.create(EchoApi.class);
     }
 
@@ -33,6 +37,31 @@ public class EchoActivityImpl implements EchoActivity {
         } catch (Exception e) {
             return "Processed with error: " + e.getMessage();
         }
+    }
+
+    @Override
+    public String postProcess(String name, int count) {
+        try {
+            HttpBinPostRequest request = new HttpBinPostRequest();
+            request.setName(name);
+            request.setCount(count);
+
+            // define POST on the fly
+            Call<HttpBinPostResponse> call = retrofit.create(PostApi.class).create(request);
+            Response<HttpBinPostResponse> response = call.execute();
+            if (response.isSuccessful() && response.body() != null) {
+                HttpBinPostResponse body = response.body();
+                return "Posted to: " + body.getUrl();
+            }
+            return "POST non-200: " + response.code();
+        } catch (Exception e) {
+            return "POST error: " + e.getMessage();
+        }
+    }
+
+    interface PostApi {
+        @retrofit2.http.POST("/post")
+        Call<HttpBinPostResponse> create(@retrofit2.http.Body HttpBinPostRequest body);
     }
 }
 

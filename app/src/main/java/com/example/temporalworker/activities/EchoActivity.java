@@ -7,6 +7,9 @@ import io.temporal.activity.ActivityMethod;
 public interface EchoActivity {
     @ActivityMethod
     String process(String input);
+
+    @ActivityMethod
+    String postProcess(String name, int count);
 }
 
 
