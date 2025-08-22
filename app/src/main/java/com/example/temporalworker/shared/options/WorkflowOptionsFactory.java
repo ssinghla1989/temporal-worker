@@ -1,7 +1,7 @@
 package com.example.temporalworker.shared.options;
 
 import io.temporal.client.WorkflowOptions;
-import io.temporal.common.WorkflowIdReusePolicy;
+import io.temporal.api.enums.v1.WorkflowIdConflictPolicy;
 import java.time.Duration;
 
 import java.util.UUID;
@@ -13,7 +13,7 @@ public final class WorkflowOptionsFactory {
         return WorkflowOptions.newBuilder()
                 .setTaskQueue(taskQueue)
                 .setWorkflowId(UUID.randomUUID().toString())
-                .setWorkflowIdReusePolicy(WorkflowIdReusePolicy.REJECT_DUPLICATE)
+                .setWorkflowIdConflictPolicy(WorkflowIdConflictPolicy.WORKFLOW_ID_CONFLICT_POLICY_REJECT_WORKFLOW)
                 .setWorkflowRunTimeout(Duration.ofMinutes(5))
                 .setWorkflowTaskTimeout(Duration.ofSeconds(10))
                 .build();
@@ -23,17 +23,17 @@ public final class WorkflowOptionsFactory {
         return WorkflowOptions.newBuilder()
                 .setTaskQueue(taskQueue)
                 .setWorkflowId(workflowId)
-                .setWorkflowIdReusePolicy(WorkflowIdReusePolicy.REJECT_DUPLICATE)
+                .setWorkflowIdConflictPolicy(WorkflowIdConflictPolicy.WORKFLOW_ID_CONFLICT_POLICY_REJECT_WORKFLOW)
                 .setWorkflowRunTimeout(Duration.ofMinutes(5))
                 .setWorkflowTaskTimeout(Duration.ofSeconds(10))
                 .build();
     }
 
-    public static WorkflowOptions withTaskQueueIdAndPolicy(String taskQueue, String workflowId, WorkflowIdReusePolicy policy) {
+    public static WorkflowOptions withTaskQueueIdAndConflictPolicy(String taskQueue, String workflowId, WorkflowIdConflictPolicy policy) {
         return WorkflowOptions.newBuilder()
                 .setTaskQueue(taskQueue)
                 .setWorkflowId(workflowId)
-                .setWorkflowIdReusePolicy(policy)
+                .setWorkflowIdConflictPolicy(policy)
                 .setWorkflowRunTimeout(Duration.ofMinutes(5))
                 .setWorkflowTaskTimeout(Duration.ofSeconds(10))
                 .build();
