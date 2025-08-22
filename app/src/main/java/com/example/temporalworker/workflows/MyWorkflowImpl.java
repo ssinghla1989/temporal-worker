@@ -1,17 +1,13 @@
 package com.example.temporalworker.workflows;
 
 import com.example.temporalworker.activities.MyActivity;
-import io.temporal.activity.ActivityOptions;
+import com.example.temporalworker.shared.options.ActivityOptionsFactory;
 import io.temporal.workflow.Workflow;
-
-import java.time.Duration;
 
 public class MyWorkflowImpl implements MyWorkflow {
     private final MyActivity activities = Workflow.newActivityStub(
             MyActivity.class,
-            ActivityOptions.newBuilder()
-                    .setStartToCloseTimeout(Duration.ofSeconds(10))
-                    .build());
+            ActivityOptionsFactory.defaultOptions());
 
     @Override
     public String execute(String input) {
