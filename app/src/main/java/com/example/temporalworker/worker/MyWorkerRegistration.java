@@ -1,6 +1,6 @@
 package com.example.temporalworker.worker;
 
-import com.example.temporalworker.activities.ExternalApiActivity;
+import com.example.temporalworker.activities.EchoActivity;
 import com.example.temporalworker.workflows.MyWorkflowImpl;
 import io.temporal.worker.Worker;
 import io.temporal.worker.WorkerFactory;
@@ -11,19 +11,19 @@ import org.springframework.stereotype.Component;
 public class MyWorkerRegistration implements WorkerRegistration {
 
     private final String taskQueue;
-    private final ExternalApiActivity externalApiActivity;
+    private final EchoActivity echoActivity;
 
     public MyWorkerRegistration(@Value("${temporal.taskQueue:MY_TASK_QUEUE}") String taskQueue,
-                                ExternalApiActivity externalApiActivity) {
+                                EchoActivity echoActivity) {
         this.taskQueue = taskQueue;
-        this.externalApiActivity = externalApiActivity;
+        this.echoActivity = echoActivity;
     }
 
     @Override
     public void register(WorkerFactory factory) {
         Worker worker = factory.newWorker(taskQueue);
         worker.registerWorkflowImplementationTypes(MyWorkflowImpl.class);
-        worker.registerActivitiesImplementations(externalApiActivity);
+        worker.registerActivitiesImplementations(echoActivity);
     }
 }
 
