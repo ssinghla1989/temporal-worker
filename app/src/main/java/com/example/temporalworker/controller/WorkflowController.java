@@ -1,6 +1,10 @@
 package com.example.temporalworker.controller;
 
-import com.example.temporalworker.service.MyWorkflowService;
+import com.example.temporalworker.shared.constants.TaskQueues;
+import com.example.temporalworker.shared.options.WorkflowOptionsFactory;
+import com.example.temporalworker.workflows.MyWorkflow;
+import io.temporal.client.WorkflowClient;
+import io.temporal.client.WorkflowOptions;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/workflows")
 public class WorkflowController {
 
-    private final MyWorkflowService myWorkflowService;
+    private final WorkflowClient workflowClient;
 
-    public WorkflowController(MyWorkflowService myWorkflowService) {
-        this.myWorkflowService = myWorkflowService;
+    public WorkflowController(WorkflowClient workflowClient) {
+        this.workflowClient = workflowClient;
     }
 
     public static class StartRequest {
@@ -25,8 +29,9 @@ public class WorkflowController {
 
     @PostMapping("/my")
     public ResponseEntity<String> startMyWorkflow(@RequestBody StartRequest request) {
-        String result = myWorkflowService.startMyWorkflow(request.input);
-        return ResponseEntity.ok(result);
+        WorkflowOptions options = WorkflowOptionsFactory.withTaskQueue(TaskQueues.MY);
+        MyWorkflow stub = workflowClient.newWorkflowStub(MyWorkflow.class, options);
+        return ResponseEntity.ok(stub.execute(request.input));
     }
 }
 
