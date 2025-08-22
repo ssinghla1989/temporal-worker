@@ -5,10 +5,10 @@ import org.springframework.stereotype.Component;
 import retrofit2.Response;
 
 @Component
-public class MyActivityImpl implements MyActivity {
+public class ExternalApiActivityImpl implements ExternalApiActivity {
     private final ExternalApiService externalApiService;
 
-    public MyActivityImpl(ExternalApiService externalApiService) {
+    public ExternalApiActivityImpl(ExternalApiService externalApiService) {
         this.externalApiService = externalApiService;
     }
 
@@ -25,5 +25,6 @@ public class MyActivityImpl implements MyActivity {
         }
     }
 }
+
 
 

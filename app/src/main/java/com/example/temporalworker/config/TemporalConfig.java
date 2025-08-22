@@ -1,7 +1,5 @@
 package com.example.temporalworker.config;
 
-import com.example.temporalworker.activities.MyActivity;
-import com.example.temporalworker.activities.MyActivityImpl;
 import com.example.temporalworker.worker.WorkerRegistration;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowClientOptions;
@@ -34,11 +32,6 @@ public class TemporalConfig {
     @Bean
     public WorkerFactory workerFactory(WorkflowClient client) {
         return WorkerFactory.newInstance(client);
-    }
-
-    @Bean
-    public MyActivity myActivity(MyActivityImpl impl) {
-        return impl;
     }
 
     @Bean
