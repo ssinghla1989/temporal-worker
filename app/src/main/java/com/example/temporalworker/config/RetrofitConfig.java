@@ -1,6 +1,5 @@
 package com.example.temporalworker.config;
 
-import com.example.temporalworker.clients.ExternalApiService;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,10 +37,7 @@ public class RetrofitConfig {
                 .build();
     }
 
-    @Bean
-    public ExternalApiService externalApiService(Retrofit retrofit) {
-        return retrofit.create(ExternalApiService.class);
-    }
+    // Remove ExternalApiService bean; activities create typed interfaces from Retrofit as needed.
 }
 
 
