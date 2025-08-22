@@ -3,6 +3,7 @@ package com.example.temporalworker.activities;
 import com.example.temporalworker.clients.model.HttpBinAnythingResponse;
 import com.example.temporalworker.clients.model.HttpBinPostRequest;
 import com.example.temporalworker.clients.model.HttpBinPostResponse;
+import io.temporal.failure.ApplicationFailure;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -33,9 +34,14 @@ public class EchoActivityImpl implements EchoActivity {
                 HttpBinAnythingResponse body = response.body();
                 return "Processed via API: method=" + body.getMethod() + ", url=" + body.getUrl();
             }
-            return "Processed with non-200: " + response.code();
+            int code = response.code();
+            String msg = "HTTP non-2xx in process: " + code;
+            if (code >= 500) {
+                throw ApplicationFailure.newFailure(msg, "HttpServerError");
+            }
+            throw ApplicationFailure.newNonRetryableFailure(msg, "HttpClientError");
         } catch (Exception e) {
-            return "Processed with error: " + e.getMessage();
+            throw ApplicationFailure.newFailure("Network error in process: " + e.getMessage(), "NetworkError");
         }
     }
 
@@ -53,9 +59,14 @@ public class EchoActivityImpl implements EchoActivity {
                 HttpBinPostResponse body = response.body();
                 return "Posted to: " + body.getUrl();
             }
-            return "POST non-200: " + response.code();
+            int code = response.code();
+            String msg = "HTTP non-2xx in postProcess: " + code;
+            if (code >= 500) {
+                throw ApplicationFailure.newFailure(msg, "HttpServerError");
+            }
+            throw ApplicationFailure.newNonRetryableFailure(msg, "HttpClientError");
         } catch (Exception e) {
-            return "POST error: " + e.getMessage();
+            throw ApplicationFailure.newFailure("Network error in postProcess: " + e.getMessage(), "NetworkError");
         }
     }
 
