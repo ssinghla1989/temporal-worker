@@ -1,7 +1,7 @@
 package com.example.temporalworker.shared.options;
 
 import io.temporal.client.WorkflowOptions;
-import io.temporal.api.enums.v1.WorkflowIdConflictPolicy;
+import io.temporal.api.enums.v1.WorkflowIdReusePolicy;
 import java.time.Duration;
 
 import java.util.UUID;
@@ -13,7 +13,7 @@ public final class WorkflowOptionsFactory {
         return WorkflowOptions.newBuilder()
                 .setTaskQueue(taskQueue)
                 .setWorkflowId(UUID.randomUUID().toString())
-                .setWorkflowIdConflictPolicy(WorkflowIdConflictPolicy.WORKFLOW_ID_CONFLICT_POLICY_REJECT_WORKFLOW)
+                .setWorkflowIdReusePolicy(WorkflowIdReusePolicy.WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE)
                 .setWorkflowRunTimeout(Duration.ofMinutes(5))
                 .setWorkflowTaskTimeout(Duration.ofSeconds(10))
                 .build();
@@ -23,17 +23,17 @@ public final class WorkflowOptionsFactory {
         return WorkflowOptions.newBuilder()
                 .setTaskQueue(taskQueue)
                 .setWorkflowId(workflowId)
-                .setWorkflowIdConflictPolicy(WorkflowIdConflictPolicy.WORKFLOW_ID_CONFLICT_POLICY_REJECT_WORKFLOW)
+                .setWorkflowIdReusePolicy(WorkflowIdReusePolicy.WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE)
                 .setWorkflowRunTimeout(Duration.ofMinutes(5))
                 .setWorkflowTaskTimeout(Duration.ofSeconds(10))
                 .build();
     }
 
-    public static WorkflowOptions withTaskQueueIdAndConflictPolicy(String taskQueue, String workflowId, WorkflowIdConflictPolicy policy) {
+    public static WorkflowOptions withTaskQueueIdAndPolicy(String taskQueue, String workflowId, WorkflowIdReusePolicy policy) {
         return WorkflowOptions.newBuilder()
                 .setTaskQueue(taskQueue)
                 .setWorkflowId(workflowId)
-                .setWorkflowIdConflictPolicy(policy)
+                .setWorkflowIdReusePolicy(policy)
                 .setWorkflowRunTimeout(Duration.ofMinutes(5))
                 .setWorkflowTaskTimeout(Duration.ofSeconds(10))
                 .build();

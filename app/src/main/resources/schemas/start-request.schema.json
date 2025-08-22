@@ -10,6 +10,11 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 1024
+    },
+    "workflowId": {
+      "type": ["string", "null"],
+      "minLength": 1,
+      "maxLength": 128
     }
   }
 }

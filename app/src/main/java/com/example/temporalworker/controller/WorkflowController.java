@@ -9,7 +9,6 @@ import com.networknt.schema.ValidationMessage;
 import io.temporal.api.common.v1.WorkflowExecution;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowOptions;
-import io.temporal.api.enums.v1.WorkflowIdConflictPolicy;
 import io.temporal.client.WorkflowExecutionAlreadyStarted;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -62,10 +61,9 @@ public class WorkflowController {
                 ? request.workflowId
                 : ("my-" + Integer.toHexString(request.input.hashCode()));
 
-        WorkflowOptions options = WorkflowOptionsFactory.withTaskQueueIdAndConflictPolicy(
+        WorkflowOptions options = WorkflowOptionsFactory.withTaskQueueAndId(
                 taskQueue,
-                workflowId,
-                WorkflowIdConflictPolicy.WORKFLOW_ID_CONFLICT_POLICY_REJECT_WORKFLOW);
+                workflowId);
 
         MyWorkflow stub = workflowClient.newWorkflowStub(MyWorkflow.class, options);
         try {
