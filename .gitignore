@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Gradle
+.gradle/
+build/
+**/build/
+.gradle-user/
+
+# Logs
+logs/
+*.log
+
+# Java
+out/
+bin/
+
+# Spring Boot
+*.jar
+*.war
+*.zip
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
